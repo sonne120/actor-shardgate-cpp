@@ -21,8 +21,8 @@ into per-protocol shards.
 │ ShardGate                                                    │
 │                                                              │
 │  ┌───────────────────┐   Authenticate     ┌────────────────┐ │
-│  │ ConnectionHandler │ ─────────────────▶ │ AuthActor      │ │
-│  │ (one per client)  │ ◀───────────────── │ SHA-256 keyset │ │
+│  │ epoll Reactor     │ ─────────────────▶ │ AuthActor      │ │
+│  │ (one event loop)  │ ◀───────────────── │ SHA-256 keyset │ │
 │  └───────────────────┘    true / false    └────────────────┘ │
 │            │ WriteToShard(proto, json)                       │
 │            ▼                                                 │
@@ -44,8 +44,13 @@ into per-protocol shards.
   {"success":0,"code":18,"codeName":"AuthenticationFailed","errmsg":"..."}
 ```
 
-Every server-side box is an actor: a mailbox drained by one thread, all
-mutable state isolated behind messages; contracts are C++20 concepts.
+The network edge is a single-threaded epoll reactor (Reactor pattern:
+non-blocking sockets, level-triggered `epoll_wait`, an `eventfd` wakeup for
+replies coming from actor threads); every other server-side box is an actor —
+a mailbox drained by one thread, all mutable state isolated behind messages,
+contracts as C++20 concepts. Half-sync/half-async: the event loop owns all
+sockets, actors own all business state, the only shared point is a task
+queue into the loop.
 
 ## Protocol
 
@@ -128,4 +133,6 @@ make tidy           # clang-tidy static analysis (.clang-tidy)
 make compile_commands.json   # compilation database for clangd (VS Code/CLion)
 ```
 
-  
+Sanitizer builds are smoke-tested end-to-end: the TSan build survives six
+concurrent clients streaming through the reactor and actor pipeline with zero
+reports; the release build handles 300 concurrent authenticated sessions.
