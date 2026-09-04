@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "auth_actor.hpp"
-#include "main_server.hpp"
+#include "reactor.hpp"
 #include "shard_router_actor.hpp"
 
 namespace {
@@ -43,7 +43,7 @@ int main() {
     std::cout << "ShardGate starting on TCP port " << port
               << " with 5 shard nodes" << "\n";
 
-    MainServer server(auth, router, port);
+    Reactor server(auth, router, port);
     int rc = server.run();
 
     router.shutdown();
