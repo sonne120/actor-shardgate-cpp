@@ -1,3 +1,9 @@
+![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C)
+![Language](https://img.shields.io/github/languages/top/sonne120/actor-shardgate-cpp)
+![Stars](https://img.shields.io/github/stars/sonne120/actor-shardgate-cpp)
+![Last commit](https://img.shields.io/github/last-commit/sonne120/actor-shardgate-cpp)
+![Repo size](https://img.shields.io/github/repo-size/sonne120/actor-shardgate-cpp)
+
 # actor-shardgate-cpp
 
 > Actor-based reimplementation of the PacketShard **MasterNode** in modern C++20.
